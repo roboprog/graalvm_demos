@@ -3,3 +3,4 @@
 .DS_Store
 compjava/target
 compjava-*
+jvm_with_js/target

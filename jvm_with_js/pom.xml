@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.roboprogs.compjava</groupId>
-  <artifactId>compjava</artifactId>
+  <groupId>com.roboprogs.jvm_with_ms</groupId>
+  <artifactId>jvm_with_js</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>compjava</name>
+  <name>jvm_with_js</name>
   <url>http://maven.apache.org</url>
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -21,7 +21,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <mainClass>
-                com.roboprogs.compjava.App
+                com.roboprogs.jvm_with_js.App
               </mainClass>
             </manifest>
           </archive>
@@ -40,7 +40,7 @@
               <archive>
                 <manifest>
                   <mainClass>
-                    com.roboprogs.compjava.App
+                    com.roboprogs.jvm_with_js.App
                   </mainClass>
                 </manifest>
               </archive>
@@ -54,11 +54,34 @@
     </plugins>
   </build>
   <dependencies>
+
+    <!-- using Graal javac/java anyway, but clue in the IDE -->
+    <dependency>
+      <groupId>org.graalvm</groupId>
+      <artifactId>graal-sdk</artifactId>
+      <version>1.0.0-rc2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>27.0.1-jre</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>RELEASE</version>
     </dependency>
   </dependencies>
 </project>

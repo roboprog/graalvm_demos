@@ -3,7 +3,7 @@
 "use strict";
 
 // hack to disable IntelliJ "staircase of doom" formatting:
-// @formater:off
+// @formatter:off
 
 /** some classes from the underlying JVM */
 const jvm = Object.freeze( {
