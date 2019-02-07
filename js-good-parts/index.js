@@ -27,7 +27,7 @@ const jvm = Object.freeze( {
     log.info( 'starting index.js' )
 
     /** fun and games with "beans" and value objects */
-    const bake_beans = function () {
+    const bake_beans = function ( print ) {
 
         /**
          * Generate a value object, with minimal boilerplate.
@@ -47,9 +47,9 @@ const jvm = Object.freeze( {
          */
         const gen_wrapped_bean = function( foo, bar, etc ) {
             const hidden_bean = new jvm.magic_bean()
-            hidden_bean.setFoo( 'foozle' )
-            hidden_bean.setBar( 'barkeep' )
-            hidden_bean.setEtc( 'extra' )
+            hidden_bean.setFoo( foo )
+            hidden_bean.setBar( bar )
+            hidden_bean.setEtc( etc )
             return Object.freeze( {
                 get foo() { return hidden_bean.getFoo() },
                 get bar() { return hidden_bean.getBar() },
@@ -58,38 +58,45 @@ const jvm = Object.freeze( {
         }
 
         var magic_bean = new jvm.magic_bean()
-        log.info( 'A bean ' + magic_bean )
-        magic_bean.setFoo( 'foozle' )
-        magic_bean.setBar( 'barkeep' )
-        magic_bean.setEtc( 'extra' )
-        log.info( 'Er, a bean ' + magic_bean )
+        print( 'A bean ' + magic_bean )
+        magic_bean.setFoo( 'foozle1' )
+        magic_bean.setBar( 'barkeep1' )
+        magic_bean.setEtc( 'extra1' )
+        print( 'Er, a bean ' + magic_bean )
 
         const basic_vo = gen_value_obj(
-            'foozle',
-            'barkeep',
-            'extra'
+            'foozle2',
+            'barkeep2',
+            'extra2'
         )
-        log.info(
+        print(
             'A value object ' +
             JSON.stringify( basic_vo )
         )
 
         const black_magic_bean = gen_wrapped_bean(
-            'foozle',
-            'barkeep',
-            'extra'
+            'foozle3',
+            'barkeep3',
+            'extra3'
         )
-        log.info(
+        print(
             'An alien value object ' +
             JSON.stringify( black_magic_bean )
         )
-        log.info( 'Looking at just bar: ' + black_magic_bean.bar )
+        print( 'Looking at just bar: ' + black_magic_bean.bar )
     }
 
     log.info( '--- Pass 1 (class loading?) ---' )
-    bake_beans()
+    bake_beans( log.info )
     log.info( '--- Pass 2 ---' )
-    bake_beans()
+    bake_beans( log.info )
+    log.info( '--- Spin through a few times with less boundary crossing ---' )
+    for ( var idx = 0 ; idx < 20000 ; idx++ ) {
+        bake_beans( function () {} )  // to /dev/null, in effect
+    }
+    log.info( '--- ... A later pass ---' )
+    bake_beans( log.info )
+    log.info( '--- DONE baking beans ---' )
 } )()
 
 
