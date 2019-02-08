@@ -113,6 +113,96 @@ const jvm = Object.freeze( {
         )
     }
 
+    /** play with lists and lists of lists */
+    const silly_lisp_tricks = function () {
+
+        /** recursively format arrays as S-expressions */
+        const a2s = function ( val ) {
+            // assume we have actual values and not null / undefined
+            return (
+                val.forEach ?  // quacks like an array?
+                    (
+                        '(' +
+                        R.join(
+                            ' ',
+                            R.map(
+                                a2s,
+                                val
+                            )
+                        ) +
+                        ')'
+                    ) :
+                    (
+                        `${ val }`  // coerce string
+                    )
+            )
+        }
+
+        const NIL = []
+        const cons = R.prepend
+        const car = R.head
+        const cdr = R.tail
+        log.info( '--- silly Lisp tricks ---' )
+        log.info( `An empty list: ${ a2s( NIL ) }` )
+        const a_list = cons(
+            'A',
+            cons(
+                'B',
+                cons(
+                    'C',
+                    NIL
+                )
+            )
+        )
+        log.info( `The list: ${ a2s( a_list ) }` )
+        log.info( `Still empty list: ${ a2s( NIL ) }` )
+        const a_tree = cons(
+            a_list,
+            cons(
+                'shallow',
+                cons(
+                    a_list,
+                    NIL
+                )
+            )
+        )
+        log.info( `The tree: ${ a2s( a_tree ) }` )
+        // really selling it here!  :-)
+        log.info(
+            `Getting the 2nd thing from the 3rd thing the hard way: ${
+                a2s(
+                    car( // -> B
+                        cdr( // -> (B C)
+                            car( // -> (A B C)
+                                cdr(  // -> ((A B C))
+                                    cdr( a_tree ) // -> (shallow (...))
+                                )
+                            )
+                        )
+                    )
+                )
+            }`
+        )
+        // back in the day, some Lisp dialects would let you string As and Ds between C and R:
+        const cadaddr = R.compose(
+            car,
+            cdr,
+            car,
+            cdr,
+            cdr
+        )
+        // exercise for the reader:  generate the above function from its name -
+        // /c([ad]+)r/, compose of map each char in match capture ...
+        log.info(
+            `Getting the 2nd thing from the 3rd thing somewhat more easily: ${
+                a2s(
+                    cadaddr( a_tree )
+                )
+            }`
+        )
+        log.info( '--- END Lisp tricks ---' )
+    }
+
     log.info( '--- Pass 1 (class loading?) ---' )
     bake_beans( log.info )
     log.info( '--- Pass 2 ---' )
@@ -138,6 +228,9 @@ const jvm = Object.freeze( {
     )
     log.info( '--- DONE with partial beans ---' )
 
+    silly_lisp_tricks()
+
+    // TODO - PFA vs D/I anti-pattern
 } )()
 
 
