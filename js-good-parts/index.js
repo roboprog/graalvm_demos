@@ -2,6 +2,8 @@
 
 "use strict";
 
+const R = require( 'ramda' )
+
 // hack to disable IntelliJ "staircase of doom" formatting:
 // @formatter:off
 
@@ -86,17 +88,56 @@ const jvm = Object.freeze( {
         print( 'Looking at just bar: ' + black_magic_bean.bar )
     }
 
+    /** an output sync - log dummy */
+    const dev_null = function () {}
+
+    /**
+     * A different way to loop :-)
+     * I wanted to see if the Graal version of node does tail call elimination,
+     * even though this is a horrible example of something for which
+     * a recursive solution is overkill.
+     * I learned it does NOT do TCE / TCO,
+     * and that the resulting stack overflow is not even something you can catch.
+     * @param run - a 0 arity function to call to do something
+     * @param remain - a counter of how many times are left to be done
+     */
+    const final_countdown = function ( run, remain ) {
+        if ( remain <= 0 ) {
+            return  // === done ===
+        }
+
+        run()
+        final_countdown(
+            run,
+            remain - 1
+        )
+    }
+
     log.info( '--- Pass 1 (class loading?) ---' )
     bake_beans( log.info )
     log.info( '--- Pass 2 ---' )
     bake_beans( log.info )
     log.info( '--- Spin through a few times with less boundary crossing ---' )
     for ( var idx = 0 ; idx < 20000 ; idx++ ) {
-        bake_beans( function () {} )  // to /dev/null, in effect
+        bake_beans( dev_null )
     }
     log.info( '--- ... A later pass ---' )
     bake_beans( log.info )
     log.info( '--- DONE baking beans ---' )
+
+    log.info( '--- A different kind of quiet spin ---' )
+    // Ramda's "apply" (etc) cannot create 0 arity functions,
+    // strictly currying, so just use js "bind":
+    const run = bake_beans.bind(
+        null,  // no "this" needed, nor wanted.
+        dev_null
+    )
+    final_countdown(
+        run,
+        2000  // but not 5000
+    )
+    log.info( '--- DONE with partial beans ---' )
+
 } )()
 
 
