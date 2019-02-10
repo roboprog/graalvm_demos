@@ -203,6 +203,119 @@ const jvm = Object.freeze( {
         log.info( '--- END Lisp tricks ---' )
     }
 
+    /** break the chain of dependency on those injections! */
+    const rehab = function() {
+
+        /**
+         * Run a query, or at least pretend to.
+         * @param connection pretend database connection
+         * @param table_meta pretend table metadata, or some other thing to be tramped around, er, injected
+         * @param year year, if any, to limit the results.
+         * @param acct account, if any, to limit the results.
+         */
+        const js_service = function ( connection, table_meta, year, acct ) {
+            const where = R.join(
+                ' and ',
+                R.filter(
+                    R.identity(),  // non-empty value is truthy
+                    [
+                        (
+                            year &&  // assume year 0 not used
+                            ( 'YEAR = ' + year )
+                        ),
+                        (
+                            acct &&
+                            ( 'ACCT = ' + acct )
+                        ),
+                    ]
+                )
+            )
+            log.info(
+                `Connect to ${
+                    connection
+                }, select * from ${
+                    table_meta
+                } ${
+                    where &&
+                    ( ' where ' + where )
+                }`
+            )
+        }
+
+        /** run the basic drill on a service method / function */
+        const drill_service = function ( actual_work ) {
+            // dependencies were supplied earlier ...
+            // ... some time later ...
+            actual_work(
+                2018,
+                8600042
+            )
+            // ... some time later ...
+            actual_work( null, null )
+            // ... some time later ...
+            actual_work(
+                null,
+                8600042
+            )
+        }
+
+        log.info( '--- Use a Java service ---')
+        const java_service = new jvm.app.DbService(
+            jvm.app.connection,
+            jvm.app.table_meta
+        )
+        drill_service( java_service.actual_work )
+
+        log.info( '--- Use a JS service ---')
+
+        /**
+         * Run a query, or at least pretend to.
+         * @function
+         * @param year year, if any, to limit the results.
+         * @param acct account, if any, to limit the results.
+         */
+        const actual_work = R.partial(
+            js_service,
+            [
+                jvm.app.connection,
+                jvm.app.table_meta,
+            ]
+        )
+
+        drill_service( actual_work )
+
+        // OK, so we did pretty much what Java did, so what?
+
+        js_service(
+            'alt_connection',
+            'ALT_TAB',
+            2018,
+            8600042
+        )
+
+        // this would work in normal js??? (or is this a buggy Ramda version?)
+        // const last_year = actual_work( 2018 )
+        const last_year = R.partial(
+            actual_work,
+            [ 2018 ]
+        )
+        // anyway, at work I rolled my own PFA facility which:
+        // - has an explicit "decorator function" to apply parms
+        // - allows 0 arity functions to be created
+        // - allows trailing parms to be omitted
+        // (another story for another day)
+
+        // ... some time later ...
+        last_year( 7779999 )
+
+        const my_acct = R.partialRight(
+            actual_work,
+            [ 555333 ]
+        )
+        // ... some time later ...
+        my_acct( 2010 )
+    }
+
     log.info( '--- Pass 1 (class loading?) ---' )
     bake_beans( log.info )
     log.info( '--- Pass 2 ---' )
@@ -229,6 +342,8 @@ const jvm = Object.freeze( {
     log.info( '--- DONE with partial beans ---' )
 
     silly_lisp_tricks()
+
+    rehab()
 
     // TODO - PFA vs D/I anti-pattern
 } )()
